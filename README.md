@@ -52,7 +52,7 @@ This project is a RESTful API for an online bookstore, built using Spring Boot. 
 1. **Clone the Repository**
 
    ```
-   bash复制代码git clone https://github.com/your-username/bookstore.git
+   git clone https://github.com/your-username/bookstore.git
    cd bookstore
    ```
 
@@ -61,31 +61,19 @@ This project is a RESTful API for an online bookstore, built using Spring Boot. 
    Use Maven to build the project and download dependencies:
 
    ```
-   bash
-   
-   
-   复制代码
    mvn clean package
    ```
-
+   
 3. **Run the Application**
 
-   ```
-   bash
-   
-   
-   复制代码
+   ```JAVA
    mvn spring-boot:run
    ```
-
+   
    Or run the generated JAR file:
-
+   
    ```
-   bash
-   
-   
-   复制代码
-   java -jar target/bookstore-0.0.1-SNAPSHOT.jar
+java -jar target/bookstore-0.0.1-SNAPSHOT.jar
    ```
 
 4. **Access the Application**
@@ -117,8 +105,8 @@ This project is a RESTful API for an online bookstore, built using Spring Boot. 
 
 - **Request Body**:
 
-  ```
-  json复制代码{
+  ```JSON
+  {
     "title": "Effective Java",
     "author": "Joshua Bloch",
     "category": "Programming",
@@ -154,11 +142,11 @@ This project is a RESTful API for an online bookstore, built using Spring Boot. 
 
 - **Request Body**:
 
-  ```
-  json复制代码{
+  ```JSON
+  {
     "title": "Effective Java - 3rd Edition",
     "author": "Joshua Bloch",
-    "category": "Programming",
+    "category": "Programming Lang",
     "price": 50.0,
     "discount": 5,
     "publisher": "Addison-Wesley",
@@ -189,11 +177,7 @@ This project is a RESTful API for an online bookstore, built using Spring Boot. 
 
   **Example**:
 
-  ```
-  sql
-  
-  
-  复制代码
+  ```http
   GET /api/books/search?keyword=Java
   ```
 
@@ -222,11 +206,7 @@ This project is a RESTful API for an online bookstore, built using Spring Boot. 
 
   **Example**:
 
-  ```
-  bash
-  
-  
-  复制代码
+  ```HTTP
   POST /api/cart/1/add?bookId=2&quantity=3
   ```
 
@@ -236,19 +216,13 @@ This project is a RESTful API for an online bookstore, built using Spring Boot. 
 
 - **Method**: `PUT`
 
-- Path Variables
-
-  :
-
-  - `cartId` - The ID of the cart.
+- **Path Variables**:
+- `cartId` - The ID of the cart.
   - `itemId` - The ID of the cart item.
 
-- Query Parameters
-
-  :
-
+- **Query Parameters**:
   - `quantity` - The new quantity.
-
+  
 - **Response**: The updated cart object.
 
 #### Remove Item from Cart
@@ -257,13 +231,11 @@ This project is a RESTful API for an online bookstore, built using Spring Boot. 
 
 - **Method**: `DELETE`
 
-- Path Variables
-
-  :
+- Path Variables:
 
   - `cartId` - The ID of the cart.
   - `itemId` - The ID of the cart item to remove.
-
+  
 - **Response**: The updated cart object.
 
 #### Get Cart Details
@@ -307,15 +279,11 @@ This project is a RESTful API for an online bookstore, built using Spring Boot. 
 
 ### Running Unit Tests
 
-Unit tests are located in the `src/test/java/com/zand/bookstore/service` directory.
+Unit tests are located in the `src/test/java/com/demo/bookstore/service` directory.
 
 To run unit tests:
 
-```
-bash
-
-
-复制代码
+```bash
 mvn test -Dtest=BookServiceTest,CartServiceTest
 ```
 
@@ -323,15 +291,11 @@ This command runs the `BookServiceTest` and `CartServiceTest` unit tests.
 
 ### Running Integration Tests
 
-Integration tests are located in the `src/test/java/com/zand/bookstore/integration` directory.
+Integration tests are located in the `src/test/java/com/demo/bookstore/integration` directory.
 
 To run integration tests:
 
-```
-bash
-
-
-复制代码
+```bash
 mvn test -Dtest=BookControllerIntegrationTest,CartControllerIntegrationTest
 ```
 
@@ -341,11 +305,7 @@ This command runs the `BookControllerIntegrationTest` and `CartControllerIntegra
 
 To execute all tests (unit and integration):
 
-```
-bash
-
-
-复制代码
+```BASH
 mvn clean test
 ```
 
