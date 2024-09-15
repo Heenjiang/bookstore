@@ -66,14 +66,14 @@ This project is a RESTful API for an online bookstore, built using Spring Boot. 
    
 3. **Run the Application**
 
-   ```JAVA
+   ```Bash
    mvn spring-boot:run
    ```
    
    Or run the generated JAR file:
    
    ```
-java -jar target/bookstore-0.0.1-SNAPSHOT.jar
+    java -jar target/bookstore-0.0.1-SNAPSHOT.jar
    ```
 
 4. **Access the Application**
@@ -90,6 +90,11 @@ java -jar target/bookstore-0.0.1-SNAPSHOT.jar
 6. **Access Swagger UI for API Documentation**
 
    - **URL**: `http://localhost:8080/swagger-ui/index.html`
+
+7. **Load Dummy Data to H2(optional)**
+
+   - **Login into the H2 console**: `http://localhost:8080/h2-console`
+   - **Run the dummy sql script via the H2 console, the script is under the resouces folder**
 
 ------
 
