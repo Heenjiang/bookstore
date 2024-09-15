@@ -35,7 +35,7 @@ public class CartService {
 
     @Transactional
     public double getTotalPrice(Long cartId) {
-        Cart cart = getCart(cartId).orElseThrow(() -> new RuntimeException("Item not found"));;
+        Cart cart = getCart(cartId).orElseThrow(() -> new ResourceNotFoundException("Cart not found " + cartId));
         return cart.getTotalPrice();
     }
 
@@ -46,10 +46,10 @@ public class CartService {
         }
 
         Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart not found" + cartId));
+                .orElseThrow(() -> new ResourceNotFoundException("Cart not found " + cartId));
 
         Book book = bookService.getBookById(bookId)
-                .orElseThrow(() -> new ResourceNotFoundException("Book not found" + bookId));
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found " + bookId));
 
         CartItem item = new CartItem();
         item.setBook(book);
@@ -68,12 +68,12 @@ public class CartService {
         }
 
         Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Cart not found " + cartId));
 
         CartItem item = cart.getItems().stream()
                 .filter(cartItem -> cartItem.getId().equals(itemId))
                 .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("Item not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Item not found " + itemId));
 
         item.setQuantity(quantity);
         return cartRepository.save(cart);
@@ -82,12 +82,12 @@ public class CartService {
     @Transactional
     public Cart removeItemFromCart(Long cartId, Long itemId) {
         Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Cart not found " + cartId));
 
         CartItem item = cart.getItems().stream()
                 .filter(cartItem -> cartItem.getId().equals(itemId))
                 .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("Item not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Item not found " + itemId));
 
         cart.removeItem(item);
         return cartRepository.save(cart);

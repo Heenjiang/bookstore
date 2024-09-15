@@ -69,7 +69,7 @@ public class CartServiceTest {
                 cartService.addItemToCart(cartId, bookId, quantity)
         );
 
-        assertEquals("Cart not found", thrown.getMessage());
+        assertEquals("Cart not found " + cartId, thrown.getMessage());
     }
 
     @Test
@@ -109,7 +109,7 @@ public class CartServiceTest {
                 cartService.updateItemQuantity(cartId, itemId, newQuantity)
         );
 
-        assertEquals("Item not found", thrown.getMessage());
+        assertEquals("Item not found " + itemId, thrown.getMessage());
     }
 
     @Test
@@ -146,7 +146,7 @@ public class CartServiceTest {
                 cartService.removeItemFromCart(cartId, itemId)
         );
 
-        assertEquals("Item not found", thrown.getMessage());
+        assertEquals("Item not found " + itemId, thrown.getMessage());
     }
 
     @Test

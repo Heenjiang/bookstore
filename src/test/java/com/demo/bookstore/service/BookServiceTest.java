@@ -23,9 +23,14 @@ public class BookServiceTest {
     @InjectMocks
     private BookService bookService;
 
+    private Book testBook;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        Book testBook = new Book();
+        when(bookRepository.save(any(Book.class))).thenReturn(testBook);
+        testBook = bookService.addBook(testBook);
     }
 
     @Test
@@ -90,13 +95,13 @@ public class BookServiceTest {
     }
 
     @Test
-    void testDeleteBook() {
-        Long id = 1L;
-        doNothing().when(bookRepository).deleteById(id);
+    void testDeleteBook_Notfound() {
+        Long testBookId = 999L;
+        RuntimeException thrown = assertThrows(RuntimeException.class, () ->
+                bookService.deleteBook(testBookId)
+        );
 
-        bookService.deleteBook(id);
-
-        verify(bookRepository).deleteById(id);
+        assertEquals("Book not found with id " + testBookId, thrown.getMessage());
     }
 
     @Test
