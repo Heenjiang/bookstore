@@ -13,12 +13,16 @@ import org.mockito.MockitoAnnotations;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-class CartServiceTest {
+public class CartServiceTest {
 
     @Mock
     private CartRepository cartRepository;
+
+    @Mock
+    private BookService bookService;
 
     @InjectMocks
     private CartService cartService;
@@ -29,77 +33,148 @@ class CartServiceTest {
     }
 
     @Test
-    void shouldCreateCart() {
-        Cart cart = new Cart();
-        when(cartRepository.save(any(Cart.class))).thenReturn(cart);
+    void testAddItemToCart() {
+        Long cartId = 1L;
+        Long bookId = 2L;
+        int quantity = 3;
 
-        Cart createdCart = cartService.createCart();
-
-        assertNotNull(createdCart);
-        verify(cartRepository, times(1)).save(cart);
-    }
-
-    @Test
-    void shouldAddItemToCart() {
         Cart cart = new Cart();
         Book book = new Book();
-        book.setTitle("Spring Boot");
 
-        when(cartRepository.findById(anyLong())).thenReturn(Optional.of(cart));
+        when(cartRepository.findById(cartId)).thenReturn(Optional.of(cart));
+        when(bookService.getBookById(bookId)).thenReturn(Optional.of(book));
         when(cartRepository.save(any(Cart.class))).thenReturn(cart);
 
-        Cart updatedCart = cartService.addItemToCart(1L, book, 2);
+        Cart result = cartService.addItemToCart(cartId, bookId, quantity);
 
-        assertEquals(1, updatedCart.getItems().size());
-        assertEquals(2, updatedCart.getItems().get(0).getQuantity());
-        verify(cartRepository, times(1)).save(cart);
+        assertNotNull(result);
+        assertEquals(1, result.getItems().size());
+        assertEquals(book, result.getItems().get(0).getBook());
+        assertEquals(quantity, result.getItems().get(0).getQuantity());
+
+        verify(cartRepository).findById(cartId);
+        verify(bookService).getBookById(bookId);
+        verify(cartRepository).save(any(Cart.class));
     }
 
     @Test
-    void shouldUpdateItemQuantityInCart() {
+    void testAddItemToCart_CartNotFound() {
+        Long cartId = 1L;
+        Long bookId = 2L;
+        int quantity = 3;
+
+        when(cartRepository.findById(cartId)).thenReturn(Optional.empty());
+
+        RuntimeException thrown = assertThrows(RuntimeException.class, () ->
+                cartService.addItemToCart(cartId, bookId, quantity)
+        );
+
+        assertEquals("Cart not found", thrown.getMessage());
+    }
+
+    @Test
+    void testUpdateItemQuantity() {
+        Long cartId = 1L;
+        Long itemId = 2L;
+        int newQuantity = 5;
+
         Cart cart = new Cart();
         CartItem item = new CartItem();
-        item.setQuantity(2);
+        item.setId(itemId);
+        item.setQuantity(3);
         cart.addItem(item);
 
-        when(cartRepository.findById(anyLong())).thenReturn(Optional.of(cart));
+        when(cartRepository.findById(cartId)).thenReturn(Optional.of(cart));
         when(cartRepository.save(any(Cart.class))).thenReturn(cart);
 
-        Cart updatedCart = cartService.updateItemQuantity(1L, 1L, 5);
+        Cart result = cartService.updateItemQuantity(cartId, itemId, newQuantity);
 
-        assertEquals(5, updatedCart.getItems().get(0).getQuantity());
-        verify(cartRepository, times(1)).save(cart);
+        assertNotNull(result);
+        assertEquals(newQuantity, result.getItems().get(0).getQuantity());
+
+        verify(cartRepository).findById(cartId);
+        verify(cartRepository).save(any(Cart.class));
     }
 
     @Test
-    void shouldRemoveItemFromCart() {
+    void testUpdateItemQuantity_ItemNotFound() {
+        Long cartId = 1L;
+        Long itemId = 2L;
+        int newQuantity = 5;
+
+        Cart cart = new Cart();
+        when(cartRepository.findById(cartId)).thenReturn(Optional.of(cart));
+
+        RuntimeException thrown = assertThrows(RuntimeException.class, () ->
+                cartService.updateItemQuantity(cartId, itemId, newQuantity)
+        );
+
+        assertEquals("Item not found", thrown.getMessage());
+    }
+
+    @Test
+    void testRemoveItemFromCart() {
+        Long cartId = 1L;
+        Long itemId = 2L;
+
         Cart cart = new Cart();
         CartItem item = new CartItem();
+        item.setId(itemId);
         cart.addItem(item);
 
-        when(cartRepository.findById(anyLong())).thenReturn(Optional.of(cart));
+        when(cartRepository.findById(cartId)).thenReturn(Optional.of(cart));
         when(cartRepository.save(any(Cart.class))).thenReturn(cart);
 
-        Cart updatedCart = cartService.removeItemFromCart(1L, 1L);
+        Cart result = cartService.removeItemFromCart(cartId, itemId);
 
-        assertTrue(updatedCart.getItems().isEmpty());
-        verify(cartRepository, times(1)).save(cart);
+        assertNotNull(result);
+        assertTrue(result.getItems().isEmpty());
+
+        verify(cartRepository).findById(cartId);
+        verify(cartRepository).save(any(Cart.class));
     }
 
     @Test
-    void shouldGetTotalPrice() {
+    void testRemoveItemFromCart_ItemNotFound() {
+        Long cartId = 1L;
+        Long itemId = 2L;
+
         Cart cart = new Cart();
-        CartItem item = new CartItem();
-        item.setQuantity(2);
+        when(cartRepository.findById(cartId)).thenReturn(Optional.of(cart));
+
+        RuntimeException thrown = assertThrows(RuntimeException.class, () ->
+                cartService.removeItemFromCart(cartId, itemId)
+        );
+
+        assertEquals("Item not found", thrown.getMessage());
+    }
+
+    @Test
+    void testAddItemToCart_Success() {
+        Long cartId = 1L;
+        Long bookId = 2L;
+        int quantity = 3;
+
+        Cart cart = new Cart();
         Book book = new Book();
-        book.setPrice(49.99);
-        item.setBook(book);
-        cart.addItem(item);
+        book.setId(bookId);
 
-        when(cartRepository.findById(anyLong())).thenReturn(Optional.of(cart));
+        when(cartRepository.findById(cartId)).thenReturn(Optional.of(cart));
+        when(bookService.getBookById(bookId)).thenReturn(Optional.of(book));
+        when(cartRepository.save(any(Cart.class))).thenReturn(cart);
 
-        double totalPrice = cartService.getTotalPrice(1L);
+        Cart result = cartService.addItemToCart(cartId, bookId, quantity);
 
-        assertEquals(99.98, totalPrice);
+        assertNotNull(result);
+        assertEquals(1, result.getItems().size());
+        CartItem addedItem = result.getItems().get(0);
+        assertEquals(book, addedItem.getBook());
+        assertEquals(quantity, addedItem.getQuantity());
+
+        verify(cartRepository).findById(cartId);
+        verify(bookService).getBookById(bookId);
+        verify(cartRepository).save(any(Cart.class));
     }
+
+
 }

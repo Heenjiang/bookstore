@@ -26,10 +26,9 @@ public class CartController {
         return cartService.createCart();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Book> getBookById(@PathVariable Long id) {
-        Optional<Book> book = bookService.getBookById(id);
-        return book.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    @PostMapping("/{cartId}/add/{itemId}")
+    public Cart addItemToCart(@PathVariable Long cartId, @PathVariable Long itemId, @RequestParam Integer quantity) {
+        return cartService.addItemToCart(cartId, itemId, quantity);
     }
 
     @PutMapping("/{cartId}/update/{itemId}")
@@ -43,8 +42,9 @@ public class CartController {
     }
 
     @GetMapping("/{cartId}")
-    public Cart getCart(@PathVariable Long cartId) {
-        return cartService.getCart(cartId);
+    public ResponseEntity<Cart> getCart(@PathVariable Long cartId) {
+        Optional<Cart> cart = cartService.getCart(cartId);
+        return cart.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{cartId}/total")

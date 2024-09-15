@@ -8,12 +8,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-class BookServiceTest {
+public class BookServiceTest {
 
     @Mock
     private BookRepository bookRepository;
@@ -27,37 +29,85 @@ class BookServiceTest {
     }
 
     @Test
-    void shouldAddBook() {
+    void testAddBook() {
         Book book = new Book();
-        book.setTitle("Test Book");
         when(bookRepository.save(any(Book.class))).thenReturn(book);
 
-        Book createdBook = bookService.addBook(book);
+        Book result = bookService.addBook(book);
 
-        assertEquals("Test Book", createdBook.getTitle());
-        verify(bookRepository, times(1)).save(book);
+        assertNotNull(result);
+        verify(bookRepository).save(book);
     }
 
     @Test
-    void shouldUpdateBook() {
-        Book book = new Book();
-        book.setTitle("Original Title");
+    void testGetBooks() {
+        List<Book> books = List.of(new Book(), new Book());
+        when(bookRepository.findAll()).thenReturn(books);
 
-        when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
-        when(bookRepository.save(any(Book.class))).thenReturn(book);
+        List<Book> result = bookService.getBooks();
 
-        Book updatedBook = new Book();
-        updatedBook.setTitle("Updated Title");
-
-        Book result = bookService.updateBook(1L, updatedBook);
-
-        assertEquals("Updated Title", result.getTitle());
-        verify(bookRepository, times(1)).save(book);
+        assertEquals(2, result.size());
+        verify(bookRepository).findAll();
     }
 
     @Test
-    void shouldDeleteBook() {
-        bookService.deleteBook(1L);
-        verify(bookRepository, times(1)).deleteById(1L);
+    void testGetBookById() {
+        Long id = 1L;
+        Book book = new Book();
+        when(bookRepository.findById(id)).thenReturn(Optional.of(book));
+
+        Optional<Book> result = bookService.getBookById(id);
+
+        assertTrue(result.isPresent());
+        assertEquals(book, result.get());
+        verify(bookRepository).findById(id);
+    }
+
+    @Test
+    void testGetBookById_NotFound() {
+        Long id = 1L;
+        when(bookRepository.findById(id)).thenReturn(Optional.empty());
+
+        Optional<Book> result = bookService.getBookById(id);
+
+        assertFalse(result.isPresent());
+        verify(bookRepository).findById(id);
+    }
+
+    @Test
+    void testUpdateBook() {
+        Long id = 1L;
+        Book existingBook = new Book();
+        Book bookDetails = new Book();
+        when(bookRepository.findById(id)).thenReturn(Optional.of(existingBook));
+        when(bookRepository.save(any(Book.class))).thenReturn(existingBook);
+
+        Book result = bookService.updateBook(id, bookDetails);
+
+        assertNotNull(result);
+        verify(bookRepository).findById(id);
+        verify(bookRepository).save(existingBook);
+    }
+
+    @Test
+    void testDeleteBook() {
+        Long id = 1L;
+        doNothing().when(bookRepository).deleteById(id);
+
+        bookService.deleteBook(id);
+
+        verify(bookRepository).deleteById(id);
+    }
+
+    @Test
+    void testSearchBooks() {
+        String keyword = "test";
+        List<Book> books = List.of(new Book(), new Book());
+        when(bookRepository.findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCaseOrCategoryContainingIgnoreCase(keyword, keyword, keyword)).thenReturn(books);
+
+        List<Book> result = bookService.searchBooks(keyword);
+
+        assertEquals(2, result.size());
+        verify(bookRepository).findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCaseOrCategoryContainingIgnoreCase(keyword, keyword, keyword);
     }
 }

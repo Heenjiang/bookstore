@@ -1,5 +1,6 @@
 package com.demo.bookstore.service;
 
+import com.demo.bookstore.exception.ResourceNotFoundException;
 import com.demo.bookstore.model.Book;
 import com.demo.bookstore.repository.BookRepository;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ public class BookService {
 
     public Book updateBook(Long id, Book bookDetails) {
         Book book = bookRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Book not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found with id " + id));
 
         book.setTitle(bookDetails.getTitle());
         book.setAuthor(bookDetails.getAuthor());
@@ -44,11 +45,17 @@ public class BookService {
     }
 
     public void deleteBook(Long id) {
-        bookRepository.deleteById(id);
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found with id " + id));
+        bookRepository.delete(book);
     }
 
     // Search books by title, author, or category
     public List<Book> searchBooks(String keyword) {
-        return bookRepository.findByTitleContainingOrAuthorContainingOrCategoryContaining(keyword, keyword, keyword);
+        return bookRepository.findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCaseOrCategoryContainingIgnoreCase(keyword, keyword, keyword);
+    }
+
+    public List<Book> getAllBooks() {
+        return bookRepository.findAll();
     }
 }
